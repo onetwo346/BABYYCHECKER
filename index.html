@@ -93,13 +93,14 @@
     .symptom-badge {
       background: rgba(59, 130, 246, 0.8);
       color: white;
-      padding: 8px 12px;
+      padding: 6px 10px; /* Reduced padding for compactness */
       border-radius: 15px;
-      font-size: 14px;
+      font-size: 13px; /* Slightly smaller font */
       animation: badge-pop 0.5s ease-in-out;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       text-align: left;
       width: 100%;
+      word-wrap: break-word; /* Ensure text wraps */
     }
     @keyframes badge-pop {
       0% { transform: scale(0); opacity: 0; }
@@ -113,8 +114,10 @@
       padding: 15px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-      max-height: 400px;
-      overflow-y: auto;
+      min-height: 200px; /* Ensure minimum height */
+      max-height: 500px; /* Increased max-height */
+      overflow-y: auto; /* Enable scrolling */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     .report-container {
       width: 300px;
@@ -123,6 +126,10 @@
       padding: 15px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+      min-height: 200px; /* Ensure minimum height */
+      max-height: 400px; /* Added max-height */
+      overflow-y: auto; /* Enable scrolling */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     .desktop-layout {
       display: flex;
@@ -141,6 +148,7 @@
         width: 100%;
         max-width: 400px;
         margin-top: 15px;
+        max-height: 300px; /* Slightly reduced for mobile */
       }
     }
   </style>
@@ -453,7 +461,7 @@
       useEffect(() => {
         let interval;
         if (isScanning) {
-          interval = setInterval(analyzeFace, 500); // Faster analysis
+          interval = setInterval(analyzeFace, 500);
         }
         return () => clearInterval(interval);
       }, [isScanning, glowProgress, detectedSymptoms, report]);
