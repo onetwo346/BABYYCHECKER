@@ -91,14 +91,13 @@
       transition: width 0.5s ease-in-out;
     }
     .symptom-badge {
-      position: relative;
       background: rgba(59, 130, 246, 0.8);
       color: white;
-      padding: 5px 10px;
+      padding: 8px 12px;
       border-radius: 15px;
-      font-size: 12px;
+      font-size: 14px;
       animation: badge-pop 0.5s ease-in-out;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       text-align: left;
       width: 100%;
     }
@@ -108,36 +107,48 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .symptoms-container {
-      position: absolute;
-      left: -250px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 230px;
-      background: rgba(15, 23, 42, 0.8);
+      width: 250px;
+      background: rgba(15, 23, 42, 0.9);
       border-radius: 1rem;
-      padding: 10px;
+      padding: 15px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+      transition: transform 0.3s ease-in-out;
+      max-height: 300px;
+      overflow-y: auto;
     }
     .report-container {
-      position: absolute;
-      left: -250px;
-      bottom: 10px;
-      width: 230px;
-      background: rgba(15, 23, 42, 0.8);
+      width: 250px;
+      background: rgba(15, 23, 42, 0.9);
       border-radius: 1rem;
-      padding: 10px;
+      padding: 15px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+      transition: transform 0.3s ease-in-out;
+    }
+    .desktop-layout {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .desktop-layout .symptoms-container {
+      transform: translateY(0);
+    }
+    .desktop-layout .report-container {
+      margin-top: 20px;
     }
     @media (max-width: 768px) {
+      .desktop-layout {
+        flex-direction: column;
+        align-items: center;
+      }
       .symptoms-container, .report-container {
-        position: relative;
-        left: 0;
-        transform: none;
-        margin-top: 10px;
         width: 100%;
         max-width: 400px;
+        margin-top: 15px;
       }
     }
   </style>
@@ -399,7 +410,7 @@
       const isMobile = screenWidth < 768;
 
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 relative">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
           <h1 className="text-4xl md:text-6xl font-bold neon-glow mb-6">
             Scan Your Glow
           </h1>
@@ -414,26 +425,19 @@
           )}
 
           {isScanning && (
-            <div className={`relative ${isMobile ? 'flex flex-col items-center' : 'flex justify-center items-center'}`}>
-              {/* Symptoms Container - Left Side on Desktop */}
-              {detectedSymptoms.length > 0 && !isMobile && (
+            <div className={isMobile ? 'flex flex-col items-center' : 'desktop-layout'}>
+              {/* Symptoms Container */}
+              {detectedSymptoms.length > 0 && (
                 <div className="symptoms-container">
-                  <h3 className="text-md font-bold mb-2 neon-glow">Detected Signs</h3>
+                  <h3 className="text-lg font-bold mb-2 neon-glow">Detected Signs</h3>
                   {detectedSymptoms.map((symptom) => (
                     <SymptomBadge key={symptom.key} symptom={symptom} />
                   ))}
                 </div>
               )}
-              
-              {/* Report Container - Left Side on Desktop */}
-              {report && !isMobile && (
-                <div className="report-container">
-                  <RadianceReport report={report} />
-                </div>
-              )}
-              
-              {/* Camera Feed and Scan - Center */}
-              <div className="scan-container relative flex flex-col items-center">
+
+              {/* Camera Feed and Scan */}
+              <div className="scan-container">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -459,25 +463,12 @@
                   Stop Scan
                 </button>
               </div>
-              
-              {/* Mobile Layout - Stack symptoms and report below camera */}
-              {isMobile && (
-                <>
-                  {detectedSymptoms.length > 0 && (
-                    <div className="bg-gray-900 bg-opacity-80 p-3 rounded-lg w-full max-w-md mt-4">
-                      <h3 className="text-md font-bold mb-2 neon-glow">Detected Signs</h3>
-                      {detectedSymptoms.map((symptom) => (
-                        <SymptomBadge key={symptom.key} symptom={symptom} />
-                      ))}
-                    </div>
-                  )}
-                  
-                  {report && (
-                    <div className="bg-gray-900 bg-opacity-80 p-3 rounded-lg w-full max-w-md mt-4">
-                      <RadianceReport report={report} />
-                    </div>
-                  )}
-                </>
+
+              {/* Report Container */}
+              {report && (
+                <div className="report-container">
+                  <RadianceReport report={report} />
+                </div>
               )}
             </div>
           )}
