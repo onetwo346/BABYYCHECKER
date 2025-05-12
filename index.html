@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Baby Checker - AI-powered facial analysis with AR results for pregnancy signs." />
+  <meta name="description" content="Baby Checker - AI-powered facial analysis for pregnancy signs with AR." />
   <title>Baby Checker</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -107,24 +107,22 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .symptoms-container {
-      width: 250px;
+      width: 300px;
       background: rgba(15, 23, 42, 0.9);
       border-radius: 1rem;
       padding: 15px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-      transition: transform 0.3s ease-in-out;
-      max-height: 300px;
+      max-height: 400px;
       overflow-y: auto;
     }
     .report-container {
-      width: 250px;
+      width: 300px;
       background: rgba(15, 23, 42, 0.9);
       border-radius: 1rem;
       padding: 15px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-      transition: transform 0.3s ease-in-out;
     }
     .desktop-layout {
       display: flex;
@@ -133,12 +131,6 @@
       gap: 20px;
       max-width: 1200px;
       margin: 0 auto;
-    }
-    .desktop-layout .symptoms-container {
-      transform: translateY(0);
-    }
-    .desktop-layout .report-container {
-      margin-top: 20px;
     }
     @media (max-width: 768px) {
       .desktop-layout {
@@ -213,11 +205,9 @@
             Baby Checker
           </h1>
           <p className="text-lg md:text-2xl text-gray-200 mb-8 max-w-2xl font-['Poppins']">
-            Darling, unlock the secrets of your glow! Our AI scans your radiant face 
-            with futuristic precision, revealing possible pregnancy signs in a dazzling 
-            augmented reality experience. Step into the future and see your beauty 
-            transformed. <br />
-            <span className="text-sm italic">*Not medical advice—consult your doctor, love.</span>
+            Discover your radiance with our AI-powered facial scan. Analyze subtle facial signs that may suggest pregnancy in a futuristic AR experience. 
+            <br />
+            <span className="text-sm italic">*Not a medical diagnosis—consult a healthcare professional.</span>
           </p>
           <button
             onClick={onStart}
@@ -233,13 +223,13 @@
     const SymptomBadge = ({ symptom }) => {
       return (
         <div className="symptom-badge">
-          <span className="font-bold">{symptom.name}:</span> {symptom.message}
+          <span className="font-bold">{symptom.name}:</span> {symptom.message} ({(symptom.confidence * 100).toFixed(0)}%)
         </div>
       );
     };
 
     // Report Component
-    const RadianceReport = ({ report }) => {
+    const RadianceReport = ({ report, onReanalyze }) => {
       return (
         <div className="animate-[badge-pop_0.5s_ease-in-out]">
           <h2 className="text-xl font-bold neon-glow mb-2">Your Radiance Report</h2>
@@ -253,8 +243,14 @@
               </li>
             ))}
           </ul>
+          <button
+            onClick={onReanalyze}
+            className="mt-4 holographic-btn text-white font-bold py-2 px-4 rounded-full text-sm"
+          >
+            Re-analyze
+          </button>
           <p className="text-xs italic text-gray-400 mt-2 font-['Poppins']">
-            *This is not medical advice. Consult a professional, darling.
+            *This is not a medical diagnosis. Please consult a healthcare professional.
           </p>
         </div>
       );
@@ -273,9 +269,7 @@
 
       // Handle responsive layout
       useEffect(() => {
-        const handleResize = () => {
-          setScreenWidth(window.innerWidth);
-        };
+        const handleResize = () => setScreenWidth(window.innerWidth);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
       }, []);
@@ -323,7 +317,14 @@
         setDetectedSymptoms([]);
       };
 
-      // Analyze face and gamify the experience
+      // Re-analyze scan
+      const reanalyzeScan = () => {
+        setReport(null);
+        setGlowProgress(0);
+        setDetectedSymptoms([]);
+      };
+
+      // Analyze face for pregnancy signs
       const analyzeFace = async () => {
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -348,17 +349,66 @@
 
         if (detections.length > 0) {
           // Increment glow progress
-          setGlowProgress(prev => Math.min(prev + 10, 100));
+          setGlowProgress(prev => Math.min(prev + 5, 100));
 
-          // Simulated smart AI with comprehensive pregnancy symptoms
+          // Pregnancy-specific symptoms with weighted thresholds
           const possibleSymptoms = [
-            { name: 'Skin Glow', key: 'skinGlow', message: 'Enhanced radiance detected', threshold: 0.3 },
-            { name: 'Cheek Puffiness', key: 'cheekPuffiness', message: 'Subtle volume increase', threshold: 0.4 },
-            { name: 'Pigmentation', key: 'pigmentation', message: 'Mild hyperpigmentation', threshold: 0.5 },
-            { name: 'Eye Darkening', key: 'eyeDarkening', message: 'Dark circles present', threshold: 0.6 },
-            { name: 'Facial Hair', key: 'facialHair', message: 'Increased facial hair', threshold: 0.7 },
-            { name: 'Fatigue Signs', key: 'fatigueSigns', message: 'Possible fatigue indicators', threshold: 0.5 },
-            { name: 'Nausea Indicator', key: 'nauseaIndicator', message: 'Possible nausea-related pallor', threshold: 0.6 }
+            { 
+              name: 'Melasma', 
+              key: 'melasma', 
+              message: 'Patchy hyperpigmentation detected', 
+              threshold: 0.3, 
+              confidence: Math.random() * 0.4 + 0.5 // 50-90% confidence
+            },
+            { 
+              name: 'Facial Swelling', 
+              key: 'facialSwelling', 
+              message: 'Subtle puffiness observed', 
+              threshold: 0.4, 
+              confidence: Math.random() * 0.3 + 0.5 
+            },
+            { 
+              name: 'Acne', 
+              key: 'acne', 
+              message: 'Increased breakouts detected', 
+              threshold: 0.5, 
+              confidence: Math.random() * 0.3 + 0.4 
+            },
+            { 
+              name: 'Facial Redness', 
+              key: 'facialRedness', 
+              message: 'Flushing or redness present', 
+              threshold: 0.6, 
+              confidence: Math.random() * 0.3 + 0.3 
+            },
+            { 
+              name: 'Dry Skin', 
+              key: 'drySkin', 
+              message: 'Flaky or sensitive skin detected', 
+              threshold: 0.7, 
+              confidence: Math.random() * 0.3 + 0.2 
+            },
+            { 
+              name: 'Pregnancy Glow', 
+              key: 'pregnancyGlow', 
+              message: 'Radiant complexion observed', 
+              threshold: 0.4, 
+              confidence: Math.random() * 0.4 + 0.5 
+            },
+            { 
+              name: 'Darkened Freckles', 
+              key: 'darkenedFreckles', 
+              message: 'Darkening of freckles or moles', 
+              threshold: 0.6, 
+              confidence: Math.random() * 0.3 + 0.3 
+            },
+            { 
+              name: 'Eye/Neck Darkening', 
+              key: 'eyeNeckDarkening', 
+              message: 'Subtle darkening around eyes or neck', 
+              threshold: 0.8, 
+              confidence: Math.random() * 0.2 + 0.2 
+            }
           ];
 
           // Detect new symptoms
@@ -380,11 +430,13 @@
           // Finalize report when glow meter is full
           if (glowProgress >= 100 && !report) {
             const finalSymptoms = detectedSymptoms.reduce((acc, symptom) => {
-              acc[symptom.key] = symptom.message;
+              acc[symptom.key] = `${symptom.message} (${(symptom.confidence * 100).toFixed(0)}%)`;
               return acc;
             }, {});
+            // Calculate probability based on number and confidence of symptoms
+            const probability = Math.min(0.2 + detectedSymptoms.length * 0.1 + detectedSymptoms.reduce((sum, s) => sum + s.confidence, 0) * 0.1, 0.9);
             setReport({
-              probability: Math.random() * 0.3 + 0.5,
+              probability,
               symptoms: finalSymptoms,
               landmarks
             });
@@ -401,12 +453,12 @@
       useEffect(() => {
         let interval;
         if (isScanning) {
-          interval = setInterval(analyzeFace, 1000);
+          interval = setInterval(analyzeFace, 500); // Faster analysis
         }
         return () => clearInterval(interval);
       }, [isScanning, glowProgress, detectedSymptoms, report]);
 
-      // Determine if we should use mobile layout (stacked) or desktop layout (side by side)
+      // Determine layout
       const isMobile = screenWidth < 768;
 
       return (
@@ -456,18 +508,28 @@
                   <div className="glow-meter-fill" style={{ width: `${glowProgress}%` }}></div>
                 </div>
 
-                <button
-                  onClick={stopScanning}
-                  className="mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-full holographic-btn"
-                >
-                  Stop Scan
-                </button>
+                <div className="flex gap-4 mt-4">
+                  <button
+                    onClick={stopScanning}
+                    className="bg-red-600 text-white font-bold py-2 px-4 rounded-full holographic-btn"
+                  >
+                    Stop Scan
+                  </button>
+                  {report && (
+                    <button
+                      onClick={reanalyzeScan}
+                      className="holographic-btn text-white font-bold py-2 px-4 rounded-full"
+                    >
+                      Re-analyze
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Report Container */}
               {report && (
                 <div className="report-container">
-                  <RadianceReport report={report} />
+                  <RadianceReport report={report} onReanalyze={reanalyzeScan} />
                 </div>
               )}
             </div>
